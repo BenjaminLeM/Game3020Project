@@ -8,7 +8,14 @@ public class PlayerController : MonoBehaviour
     Rigidbody m_rb;
     [SerializeField]
     float speed;
+    [SerializeField]
+    float jumpHeight;
     float xAxis, yAxis;
+    [SerializeField]
+    float groundedCooldown = 0.1f;
+    float groundedTime = 0.0f;
+    bool groundedTimerStart = false;
+    bool canJump = false;
     Vector3 playerMovementVector;
     Vector2 mouseDelta;
     [SerializeField]
@@ -43,8 +50,8 @@ public class PlayerController : MonoBehaviour
             {
                 Cursor.lockState = CursorLockMode.Locked;
             }
-            
         }
+        
     }
 
     private void FixedUpdate()
@@ -52,6 +59,15 @@ public class PlayerController : MonoBehaviour
         setPlayerCamera();
         //checks players hinge joint to see if it is out of bounds
         checkPlayerCameraJoint();
+
+        if (groundedTimerStart && !canJump)
+        {
+            groundedTimer();
+        }
+        else if(canJump)
+        {
+            groundedTimerStart = false;
+        }
     }
 
     void setCameraJoints() 
@@ -74,7 +90,6 @@ public class PlayerController : MonoBehaviour
         m_rb.GetComponent<Transform>().Rotate(0.0f, cameraRotation.x, 0.0f);
 
         m_springJoint.targetPosition = currentAnglePos - cameraRotation.y;
-        Debug.Log(m_springJoint.targetPosition);
         currentAnglePos -= cameraRotation.y;
         m_cameraJoint.spring = m_springJoint;
         cameraRotation = Vector2.zero;
@@ -95,12 +110,67 @@ public class PlayerController : MonoBehaviour
     {
         xAxis = Input.GetAxisRaw("Horizontal") * speed * Time.deltaTime;
         yAxis = Input.GetAxisRaw("Vertical") * speed * Time.deltaTime;
+        
 
         playerMovementVector = transform.position - (transform.forward * xAxis) + (transform.right * yAxis);
+        if (canJump && Input.GetAxisRaw("Jump") > 0)
+        {
+
+            m_rb.AddForce(jumpHeight * transform.up);
+        }
     }
 
+    void setGrounded(bool state) 
+    {
+        canJump = state;
+    }
+    void groundedTimer() 
+    {
+        groundedTime += Time.deltaTime;
+        if (groundedTime >= groundedCooldown)
+            {
+                setGrounded(true);
+                groundedTime = 0;
+            }
+    }
     void Move() 
     {
         transform.position = playerMovementVector;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.name.Contains("Ground")) 
+        {
+            groundedTimerStart = true;
+        }
+    }
+
+
+    //private void OnCollisionStay(Collision collision)
+    //{
+    //    if (collision.gameObject.name.Contains("Ground"))
+    //    {
+    //        if (isGrounded == true) 
+    //        {
+    //            timer += Time.deltaTime;
+    //            Debug.Log("hello");
+    //        }
+    //        
+    //        if (timer >= timeTilGrounded) 
+    //        {
+    //            setGrounded(true);
+    //            timer = 0;
+    //            Debug.Log("hi");
+    //        }
+    //    }
+    //}
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.name.Contains("Ground"))
+        {
+            setGrounded(false);
+        }
     }
 }

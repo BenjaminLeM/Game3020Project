@@ -592,6 +592,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
+  jumpHeight: 30
   cameraSpeed: 1000
 --- !u!59 &1457171484
 HingeJoint:
@@ -645,7 +646,7 @@ GameObject:
   - component: {fileID: 1500412045}
   - component: {fileID: 1500412044}
   m_Layer: 0
-  m_Name: Plane
+  m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
