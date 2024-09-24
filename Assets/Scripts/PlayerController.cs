@@ -6,8 +6,9 @@ public class PlayerController : MonoBehaviour
 {
     // Start is called before the first frame update
     Rigidbody m_rb;
-    [SerializeField]
     float speed;
+    [SerializeField]
+    float walkSpeed;
     [SerializeField]
     float jumpHeight;
     float xAxis, yAxis;
@@ -29,9 +30,18 @@ public class PlayerController : MonoBehaviour
     bool isSprinting = false;
     [SerializeField]
     float sprintSpeed;
+    float sprintTimer = 0.0f;
+    [SerializeField]
+    float crouchSpeed;
+    [SerializeField]
+    float slideCooldown;
+    [SerializeField]
+    float slideSpeed;
     void Start()
     {
         m_rb = GetComponent<Rigidbody>();
+
+        speed = walkSpeed;
 
         setCameraJoints();
     }
@@ -113,15 +123,33 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetAxisRaw("Sprint") > 0)
         {
-            xAxis = Input.GetAxisRaw("Horizontal") * sprintSpeed * Time.deltaTime;
-            yAxis = Input.GetAxisRaw("Vertical") * sprintSpeed * Time.deltaTime;
+            if (Input.GetAxisRaw("Crouch") > 0 && sprintTimer >= slideCooldown)
+            {
+                sprintTimer = 0;
+                m_rb.AddForce(transform.right * slideSpeed, ForceMode.Impulse);
+                speed = crouchSpeed;
+            }
+            else if (Input.GetAxisRaw("Crouch") > 0) 
+            {
+                speed = crouchSpeed;
+            }
+            else
+            {
+                sprintTimer += Time.deltaTime;
+                speed = sprintSpeed;
+            }
         }
-        else 
+        else if (Input.GetAxisRaw("Crouch") > 0) 
         {
-            xAxis = Input.GetAxisRaw("Horizontal") * speed * Time.deltaTime;
-            yAxis = Input.GetAxisRaw("Vertical") * speed * Time.deltaTime;
+            speed = crouchSpeed;
         }
-        
+        else
+        {
+            speed = walkSpeed;
+        }
+        xAxis = Input.GetAxisRaw("Horizontal") * speed * Time.deltaTime;
+        yAxis = Input.GetAxisRaw("Vertical") * speed * Time.deltaTime;
+
 
         playerMovementVector = transform.position - (transform.forward * xAxis) + (transform.right * yAxis);
         if (canJump && Input.GetAxisRaw("Jump") > 0)
