@@ -593,7 +593,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 5
   jumpHeight: 30
+  groundedCooldown: 0.1
   cameraSpeed: 1000
+  sprintSpeed: 8
 --- !u!59 &1457171484
 HingeJoint:
   m_ObjectHideFlags: 0

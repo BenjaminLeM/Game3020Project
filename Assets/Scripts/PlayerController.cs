@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     float groundedCooldown = 0.1f;
     float groundedTime = 0.0f;
-    bool groundedTimerStart = false;
+    bool groundedTimerActive = false;
     bool canJump = false;
     Vector3 playerMovementVector;
     Vector2 mouseDelta;
@@ -26,6 +26,9 @@ public class PlayerController : MonoBehaviour
     float CameraSpring = 2000.0f;
     float CameraSpringDampen = 10.0f;
     float currentAnglePos = 0;
+    bool isSprinting = false;
+    [SerializeField]
+    float sprintSpeed;
     void Start()
     {
         m_rb = GetComponent<Rigidbody>();
@@ -60,13 +63,13 @@ public class PlayerController : MonoBehaviour
         //checks players hinge joint to see if it is out of bounds
         checkPlayerCameraJoint();
 
-        if (groundedTimerStart && !canJump)
+        if (groundedTimerActive && !canJump)
         {
             groundedTimer();
         }
         else if(canJump)
         {
-            groundedTimerStart = false;
+            groundedTimerActive = false;
         }
     }
 
@@ -108,8 +111,16 @@ public class PlayerController : MonoBehaviour
     }
     void GetPlayerMovementInput() 
     {
-        xAxis = Input.GetAxisRaw("Horizontal") * speed * Time.deltaTime;
-        yAxis = Input.GetAxisRaw("Vertical") * speed * Time.deltaTime;
+        if (Input.GetAxisRaw("Sprint") > 0)
+        {
+            xAxis = Input.GetAxisRaw("Horizontal") * sprintSpeed * Time.deltaTime;
+            yAxis = Input.GetAxisRaw("Vertical") * sprintSpeed * Time.deltaTime;
+        }
+        else 
+        {
+            xAxis = Input.GetAxisRaw("Horizontal") * speed * Time.deltaTime;
+            yAxis = Input.GetAxisRaw("Vertical") * speed * Time.deltaTime;
+        }
         
 
         playerMovementVector = transform.position - (transform.forward * xAxis) + (transform.right * yAxis);
@@ -142,7 +153,7 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.gameObject.name.Contains("Ground")) 
         {
-            groundedTimerStart = true;
+            groundedTimerActive = true;
         }
     }
 
