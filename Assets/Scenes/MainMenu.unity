@@ -1765,7 +1765,9 @@ MonoBehaviour:
     a burst of speed after a certian amount of time spent sprinting
 
     Space -
-    Jump'
+    Jump
+
+    Tab - Pauses Game'
 --- !u!222 &2030493317
 CanvasRenderer:
   m_ObjectHideFlags: 0
