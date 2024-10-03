@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SocialPlatforms;
 
@@ -7,17 +8,29 @@ public class PlayerController : MonoBehaviour
 {
     // Start is called before the first frame update
     Rigidbody m_rb;
-    float speed;
-    [SerializeField]
-    float walkSpeed;
-    [SerializeField]
-    float jumpHeight;
+    PlayerCharacter character;
+    CustomPlayerGravity gravity;
     float xAxis, yAxis;
+    float sprintTimer = 0.0f;
     [SerializeField]
     float groundedCooldown = 0.1f;
     float groundedTime = 0.0f;
     bool groundedTimerActive = false;
     bool isGrounded = false;
+    float timeSinceLastGrounded = 0.0f;
+    float coyoteJump = 0.5f;
+
+    //if player is wallRiding used to detect if they can wall jump
+    bool isWallRiding = false;
+    //is true then the player characters rotation need to be reset
+    bool NeedTiltReset = false;
+    //used to detect the last side of the character touched a wall
+    bool LeftRightWall = false;
+
+    Vector3 WallJumpForce = Vector3.zero;
+    bool wallRidingTimerActive = false;
+    float wallRidingCooldown = 0.5f;
+    float wallRidingTime = 0.0f;
     Vector3 playerMovementVector;
     Vector2 mouseDelta;
     [SerializeField]
@@ -28,26 +41,25 @@ public class PlayerController : MonoBehaviour
     float CameraSpring = 2000.0f;
     float CameraSpringDampen = 10.0f;
     float currentAnglePos = 0;
-    bool isSprinting = false;
     [SerializeField]
-    float sprintSpeed;
-    float sprintTimer = 0.0f;
+    Camera fpsCamera;
     [SerializeField]
-    float crouchSpeed;
-    [SerializeField]
-    float crouchHeight;
-    float currentHeight;
-    [SerializeField]
-    float slideCooldown;
-    [SerializeField]
-    float slideSpeed;
-    [SerializeField]
+    Camera ThirdPersonCamera;
+
+    ShotgunJump gunJump;
+    
     Canvas PauseMenu;
     void Start()
     {
         m_rb = GetComponent<Rigidbody>();
 
-        speed = walkSpeed;
+        character = GetComponent<PlayerCharacter>();
+
+        gravity = GetComponent<CustomPlayerGravity>();
+
+        gunJump = GetComponent<ShotgunJump>();
+
+        character.setPlayerMoveSpeed(character.WalkSpeed());
 
         setCameraJoints();
 
@@ -71,19 +83,20 @@ public class PlayerController : MonoBehaviour
         checkPlayerCameraJoint();
 
         //sets player height
-        setPlayerScale(new Vector3(transform.localScale.x,
-                                            currentHeight,
-                                            transform.localScale.z));
+        character.setCurrentHeight(character.getCrouchHeight());
 
-        if (groundedTimerActive && !isGrounded)
-        {
-            groundedTimer();
-        }
-        else if(isGrounded)
-        {
-            groundedTimerActive = false;
-        }
         checkGrounded();
+
+        //check for if the player can wall ride
+        if (!isGrounded && !wallRidingTimerActive) 
+        {
+            checkIsWallRiding();
+        }
+
+        if (wallRidingTimerActive) 
+        {
+            wallRidingTimer();
+        }
     }
 
     //player camera functions
@@ -99,7 +112,7 @@ public class PlayerController : MonoBehaviour
     }
     void GetPlayerCameraInput() 
     {
-        mouseDelta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+        mouseDelta = new Vector2(Input.GetAxis("Mouse X"), -Input.GetAxis("Mouse Y"));
         cameraRotation += mouseDelta * cameraSpeed * Time.deltaTime;
     }
 
@@ -129,43 +142,57 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetAxisRaw("Sprint") > 0)
         {
-            if (Input.GetAxisRaw("Crouch") > 0 && sprintTimer >= slideCooldown)
+            if (Input.GetAxisRaw("Crouch") > 0 && sprintTimer >= character.SlideCooldown())
             {
                 sprintTimer = 0;
-                m_rb.AddForce(transform.right * slideSpeed, ForceMode.Impulse);
-                speed = crouchSpeed;
-                currentHeight = crouchHeight;
+                //player can only slide if the player is considered grounded
+                if (isGrounded)
+                {
+                    m_rb.AddForce(transform.forward * character.SlideSpeed(), ForceMode.Impulse);
+                }
+                character.setPlayerMoveSpeed(character.CrouchSpeed());
+                character.setCurrentHeight(character.getCrouchHeight());
             }
             else if (Input.GetAxisRaw("Crouch") > 0) 
             {
-                speed = crouchSpeed;
-                currentHeight = crouchHeight;
+                character.setPlayerMoveSpeed(character.CrouchSpeed());
+                character.setCurrentHeight(character.getCrouchHeight());
             }
             else
             {
                 sprintTimer += Time.deltaTime;
-                speed = sprintSpeed;
-                currentHeight = 1;
+                character.setPlayerMoveSpeed(character.SprintSpeed());
+                character.setCurrentHeight(1);
             }
         }
         else if (Input.GetAxisRaw("Crouch") > 0) 
         {
-            speed = crouchSpeed;
-            currentHeight = crouchHeight;
+            character.setPlayerMoveSpeed(character.CrouchSpeed());
+            character.setCurrentHeight(character.getCrouchHeight());
         }
         else
         {
-            speed = walkSpeed;
-            currentHeight = 1;
+            character.setPlayerMoveSpeed(character.WalkSpeed());
+            character.setCurrentHeight(1);
         }
-        xAxis = Input.GetAxisRaw("Horizontal") * speed * Time.deltaTime;
-        yAxis = Input.GetAxisRaw("Vertical") * speed * Time.deltaTime;
+        xAxis = Input.GetAxisRaw("Horizontal") * character.getPlayerMoveSpeed() * Time.deltaTime;
+        yAxis = Input.GetAxisRaw("Vertical") * character.getPlayerMoveSpeed() * Time.deltaTime;
 
+        
+        playerMovementVector = transform.position + (transform.right * xAxis) + (transform.forward * yAxis);
 
-        playerMovementVector = transform.position - (transform.forward * xAxis) + (transform.right * yAxis);
+        float calculatedJumpForce = Mathf.Sqrt(character.JumpHeight() * -2 * (Physics.gravity.y));
         if (isGrounded && Input.GetAxisRaw("Jump") > 0)
         {
-            m_rb.AddForce(jumpHeight * transform.up);
+            m_rb.AddForce(calculatedJumpForce * transform.up, ForceMode.Impulse);
+            setGrounded(false);
+        }
+        //checks for wallriding
+        else if (isWallRiding && Input.GetAxisRaw("Jump") > 0 && !wallRidingTimerActive) 
+        {
+            m_rb.AddForce(calculatedJumpForce * transform.up/2, ForceMode.Impulse);
+            m_rb.AddForce(WallJumpForce, ForceMode.Impulse);
+            wallRidingTimerActive = true;
         }
 
         if (Input.GetAxisRaw("Pause") > 0) 
@@ -174,8 +201,98 @@ public class PlayerController : MonoBehaviour
             Time.timeScale = 0;
             Cursor.lockState = CursorLockMode.None;
         }
+
+        if (Input.GetAxisRaw("CameraSwitch") > 0)
+        {
+            
+                fpsCamera.enabled = false;
+                ThirdPersonCamera.enabled = true;
+            
+        }
+        else if (Input.GetAxisRaw("CameraSwitch") < 0) 
+        {
+            fpsCamera.enabled = true;
+            ThirdPersonCamera.enabled = false;
+        }
+
+        if (Input.GetAxisRaw("Fire1") > 0) 
+        {
+            gunJump.Launch();
+        }
+
+        if (Input.GetAxisRaw("Fire2") > 0) 
+        {
+            gunJump.Reload();
+        }
     }
 
+    void checkIsWallRiding() 
+    {
+        RaycastHit hit;
+        
+        //checks for rightside of the player for collisions
+        if (Physics.Linecast(transform.position, transform.position + (transform.right * (0.25f + transform.localScale.x)),
+                                                            out hit, -1,
+                                                            QueryTriggerInteraction.Ignore))
+        {
+            WallJumpForce = (transform.forward * (character.JumpHeight())) 
+                - (transform.right * (character.JumpHeight()/2));
+            if (!isWallRiding && hit.transform != transform) 
+            {
+                transform.Rotate(Vector3.forward * 15);
+                LeftRightWall = true;
+                isWallRiding = true;
+                //sets gravity to a custom amount, ie low gravity
+                gravity.EnableCustomGravity();
+                Debug.Log("right");
+            }
+            
+        }
+        //checks for the leftside of the player for collisions
+        else if (Physics.Linecast(transform.position, transform.position - (transform.right * (0.25f + transform.localScale.x)),
+                                                            out hit, -1,
+                                                            QueryTriggerInteraction.Ignore))
+        {
+            WallJumpForce = (transform.forward * (character.JumpHeight()))
+                + (transform.right * (character.JumpHeight() / 2));
+            if (!isWallRiding && hit.transform!=transform)
+            {
+                transform.Rotate(Vector3.forward * -15);
+                LeftRightWall = false;
+                isWallRiding = true;
+                //sets gravity to a custom amount, ie low gravity
+                gravity.EnableCustomGravity();
+                Debug.Log("left");
+            }
+        }
+        else 
+        {
+            if (isWallRiding) 
+            {
+                if (LeftRightWall)
+                {
+                    transform.Rotate(Vector3.forward * -15);
+                }
+                else 
+                {
+                    transform.Rotate(Vector3.forward * 15);
+                }
+                isWallRiding = false;
+            }
+            WallJumpForce = Vector3.zero;
+            gravity.DisableCustomGravity();
+        }
+    }
+
+    void wallRidingTimer() 
+    {
+        wallRidingTime += Time.deltaTime;
+        if (wallRidingTime >= wallRidingCooldown)
+        {
+            wallRidingTimerActive = false;
+            groundedTime = 0;
+        }
+    }
     void checkGrounded() 
     {
         RaycastHit hit;
@@ -190,35 +307,33 @@ public class PlayerController : MonoBehaviour
                 groundedTimerActive = true;
             }
         }
-        else
+        else if (timeSinceLastGrounded > coyoteJump)
         {
             setGrounded(false);
+            timeSinceLastGrounded = 0;
+        }
+        else 
+        {
+            timeSinceLastGrounded += Time.deltaTime;
+        }
+
+        if (groundedTimerActive && !isGrounded)
+        {
+            groundedTime += Time.deltaTime;
+            if (groundedTime >= groundedCooldown)
+            {
+                setGrounded(true);
+                groundedTime = 0;
+            }
+        }
+        else if (isGrounded)
+        {
+            groundedTimerActive = false;
         }
     }
     void setGrounded(bool state) 
     {
         isGrounded = state;
-    }
-    void groundedTimer() 
-    {
-        groundedTime += Time.deltaTime;
-        if (groundedTime >= groundedCooldown)
-            {
-                setGrounded(true);
-                groundedTime = 0;
-            }
-    }
-
-    void setPlayerScale(Vector3 playerScale) 
-    {
-        if (transform.localScale == playerScale)
-        {
-            return;
-        }
-        else 
-        {
-            transform.localScale = playerScale;
-        }
     }
     void Move() 
     {

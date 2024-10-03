@@ -1767,7 +1767,10 @@ MonoBehaviour:
     Space -
     Jump
 
-    Tab - Pauses Game'
+    Tab - Pauses Game
+
+    LeftClick - Launches you in the opposite direction
+    you are facing'
 --- !u!222 &2030493317
 CanvasRenderer:
   m_ObjectHideFlags: 0
