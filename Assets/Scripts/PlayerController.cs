@@ -47,7 +47,8 @@ public class PlayerController : MonoBehaviour
     Camera ThirdPersonCamera;
 
     ShotgunJump gunJump;
-    
+
+    [SerializeField]
     Canvas PauseMenu;
     void Start()
     {
