@@ -232,9 +232,10 @@ public class PlayerController : MonoBehaviour
         RaycastHit hit;
         
         //checks for rightside of the player for collisions
-        if (Physics.Linecast(transform.position, transform.position + (transform.right * (0.25f + transform.localScale.x)),
+        if (Physics.Linecast(transform.position, transform.position + (transform.right * (0.25f + transform.localScale.x) ),
                                                             out hit, -1,
-                                                            QueryTriggerInteraction.Ignore))
+                                                            QueryTriggerInteraction.Ignore)
+            && (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0))
         {
             WallJumpForce = (transform.forward * (character.JumpHeight())) 
                 - (transform.right * (character.JumpHeight()/2));
@@ -252,7 +253,8 @@ public class PlayerController : MonoBehaviour
         //checks for the leftside of the player for collisions
         else if (Physics.Linecast(transform.position, transform.position - (transform.right * (0.25f + transform.localScale.x)),
                                                             out hit, -1,
-                                                            QueryTriggerInteraction.Ignore))
+                                                            QueryTriggerInteraction.Ignore)
+            && (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0))
         {
             WallJumpForce = (transform.forward * (character.JumpHeight()))
                 + (transform.right * (character.JumpHeight() / 2));
