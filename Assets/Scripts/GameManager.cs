@@ -32,7 +32,7 @@ public class GameManager : MonoBehaviour
         UITimer.text = "Time: " + Math.Round(GameTime, 2).ToString();
     }
 
-    void addScore(float amount) 
+    public void addScore(float amount) 
     {
         score += amount;
         Score.text = score.ToString();
