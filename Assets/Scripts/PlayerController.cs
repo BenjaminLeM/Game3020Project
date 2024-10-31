@@ -140,13 +140,6 @@ public class PlayerController : MonoBehaviour
         ThirdPersonCamera.fieldOfView -= cameraIncresedFOVAmount;
         cameraIncresedFOVAmount = 0;
     }
-
-    IEnumerator SlideFOV(float amount) 
-    {
-        cameraIncreaseFOV(amount);
-        yield return new WaitForSeconds(2f);
-        resetCameraFOV();
-    }
     void checkPlayerCameraJoint() 
     {
         if (currentAnglePos > m_cameraJoint.limits.max)

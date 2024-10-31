@@ -32,7 +32,7 @@ public class CoinBehaviour : BasePickUpBehaviour
     public override void PickUpAction()
     {
         gameManager.addScore(100);
-        audioSource.PlayOneShot(coinPickUp, 0.5f);
+        audioSource.PlayOneShot(coinPickUp, 0.3f);
         StartCoroutine(despawnCoin(coinPickUp.length));
     }
 
