@@ -22,6 +22,8 @@ public class WinScreen : MonoBehaviour
     void Retry()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        Cursor.lockState = CursorLockMode.Locked;
+        Time.timeScale = 1;
     }
     void MainMenu()
     {
