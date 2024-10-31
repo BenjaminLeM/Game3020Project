@@ -44,6 +44,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     Camera ThirdPersonCamera;
 
+    float cameraIncresedFOVAmount = 0;
+
     ShotgunJump gunJump;
 
     [SerializeField]
@@ -74,7 +76,6 @@ public class PlayerController : MonoBehaviour
         GetPlayerCameraInput();
         GetPlayerMovementInput();
         Move();
-        
     }
 
     private void FixedUpdate()
@@ -127,6 +128,25 @@ public class PlayerController : MonoBehaviour
         cameraRotation = Vector2.zero;
     }
 
+    void cameraIncreaseFOV(float amount) 
+    {
+        fpsCamera.fieldOfView += amount;
+        ThirdPersonCamera.fieldOfView += amount;
+        cameraIncresedFOVAmount += amount;
+    }
+    void resetCameraFOV() 
+    {
+        fpsCamera.fieldOfView -= cameraIncresedFOVAmount;
+        ThirdPersonCamera.fieldOfView -= cameraIncresedFOVAmount;
+        cameraIncresedFOVAmount = 0;
+    }
+
+    IEnumerator SlideFOV(float amount) 
+    {
+        cameraIncreaseFOV(amount);
+        yield return new WaitForSeconds(2f);
+        resetCameraFOV();
+    }
     void checkPlayerCameraJoint() 
     {
         if (currentAnglePos > m_cameraJoint.limits.max)
@@ -143,6 +163,11 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetAxisRaw("Sprint") > 0)
         {
+            if (sprintTimer == 0 && Input.GetAxisRaw("Crouch") == 0)
+            {
+                cameraIncreaseFOV(10.0f);
+            }
+
             if (Input.GetAxisRaw("Crouch") > 0 && sprintTimer >= character.SlideCooldown())
             {
                 sprintTimer = 0;
@@ -169,13 +194,17 @@ public class PlayerController : MonoBehaviour
         }
         else if (Input.GetAxisRaw("Crouch") > 0) 
         {
+            sprintTimer = 0;
             character.setPlayerMoveSpeed(character.CrouchSpeed());
             character.setCurrentHeight(character.getCrouchHeight());
+            resetCameraFOV();
         }
         else
         {
+            sprintTimer = 0;
             character.setPlayerMoveSpeed(character.WalkSpeed());
             character.setCurrentHeight(1);
+            resetCameraFOV();
         }
         xAxis = Input.GetAxisRaw("Horizontal") * character.getPlayerMoveSpeed() * Time.deltaTime;
         yAxis = Input.GetAxisRaw("Vertical") * character.getPlayerMoveSpeed() * Time.deltaTime;
@@ -194,7 +223,6 @@ public class PlayerController : MonoBehaviour
         {
             m_rb.AddForce(calculatedJumpForce * transform.up * 3, ForceMode.Impulse);
             m_rb.AddForce(WallJumpForce, ForceMode.Impulse);
-            Debug.Log(wallRidingTime);
             wallRidingTimerActive = true;
         }
 
