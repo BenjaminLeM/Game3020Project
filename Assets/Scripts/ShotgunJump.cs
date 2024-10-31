@@ -4,13 +4,9 @@ using UnityEngine;
 
 public class ShotgunJump : MonoBehaviour
 {
-    [SerializeField]
-    Transform LookDirection;
-    [SerializeField]
-    float LaunchForce = 5;
+    float LaunchForce = 30;
     bool onCoolDown = false;
     Rigidbody m_rb;
-
     private void Awake()
     {
         m_rb = GetComponent<Rigidbody>();
@@ -20,7 +16,7 @@ public class ShotgunJump : MonoBehaviour
     {
         if (!onCoolDown)
         {
-            m_rb.AddForce(-LookDirection.forward * LaunchForce, ForceMode.Impulse);
+            m_rb.AddForce(-FindObjectOfType<Camera>().transform.forward * LaunchForce, ForceMode.Impulse);
             onCoolDown = true;
         }
     }

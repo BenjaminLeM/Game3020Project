@@ -22,8 +22,6 @@ public class PlayerController : MonoBehaviour
 
     //if player is wallRiding used to detect if they can wall jump
     bool isWallRiding = false;
-    //is true then the player characters rotation need to be reset
-    bool NeedTiltReset = false;
     //used to detect the last side of the character touched a wall
     bool LeftRightWall = false;
 
@@ -50,6 +48,8 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     Canvas PauseMenu;
+
+    AudioClip slidingSound;
     void Start()
     {
         m_rb = GetComponent<Rigidbody>();
@@ -58,7 +58,7 @@ public class PlayerController : MonoBehaviour
 
         gravity = GetComponent<CustomPlayerGravity>();
 
-        gunJump = GetComponent<ShotgunJump>();
+        slidingSound = Resources.Load<AudioClip>("SFX/SlidingNoise");
 
         character.setPlayerMoveSpeed(character.WalkSpeed());
 
@@ -150,6 +150,7 @@ public class PlayerController : MonoBehaviour
                 if (isGrounded)
                 {
                     m_rb.AddForce(transform.forward * character.SlideSpeed(), ForceMode.Impulse);
+                    GetComponent<AudioSource>().PlayOneShot(slidingSound, 0.5f);
                 }
                 character.setPlayerMoveSpeed(character.CrouchSpeed());
                 character.setCurrentHeight(character.getCrouchHeight());
@@ -216,14 +217,17 @@ public class PlayerController : MonoBehaviour
             ThirdPersonCamera.enabled = false;
         }
 
-        if (Input.GetAxisRaw("Fire1") > 0) 
+        if (gunJump != null)
         {
-            gunJump.Launch();
-        }
+            if (Input.GetAxisRaw("Fire1") > 0)
+            {
+                gunJump.Launch();
+            }
 
-        if (Input.GetAxisRaw("Fire2") > 0) 
-        {
-            gunJump.Reload();
+            if (Input.GetAxisRaw("Fire2") > 0)
+            {
+                gunJump.Reload();
+            }
         }
     }
 
@@ -341,6 +345,11 @@ public class PlayerController : MonoBehaviour
     void Move() 
     {
         transform.position = playerMovementVector;
+    }
+
+    public void setGunComp(ShotgunJump gun) 
+    {
+        gunJump = gun;
     }
 }
 
