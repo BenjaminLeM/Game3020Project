@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class ShotGunPickUpBehaviour : BasePickUpBehaviour
@@ -22,6 +23,11 @@ public class ShotGunPickUpBehaviour : BasePickUpBehaviour
     {
         FindAnyObjectByType<PlayerCharacter>().gameObject.AddComponent<ShotgunJump>();
         FindAnyObjectByType<PlayerController>().setGunComp(FindAnyObjectByType<PlayerCharacter>().GetComponent<ShotgunJump>());
+        GameObject gun = Instantiate(Resources.Load<GameObject>("Models/ShortDoubleBarrel"));
+        gun.transform.parent = FindAnyObjectByType<PlayerCharacter>().transform.GetChild(0).GetChild(0);
+        gun.transform.position = gun.transform.parent.position + gun.transform.parent.forward - (gun.transform.parent.up * 0.25f);
+        gun.transform.forward = -gun.transform.parent.forward;
+
         StartCoroutine(despawnObject(0));
     }
 

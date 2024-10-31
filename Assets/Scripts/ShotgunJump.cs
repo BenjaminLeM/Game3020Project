@@ -6,23 +6,49 @@ public class ShotgunJump : MonoBehaviour
 {
     float LaunchForce = 30;
     bool onCoolDown = false;
+    bool needsReloading = false;
+    float reloadCooldown = 1.0f;
     Rigidbody m_rb;
+
+    AudioClip firingNoise;
+
+    AudioClip reloadNoise;
     private void Awake()
     {
         m_rb = GetComponent<Rigidbody>();
+        firingNoise = Resources.Load<AudioClip>("SFX/ShotGunFiring");
+        reloadNoise = Resources.Load<AudioClip>("SFX/ShotGunReload");
     }
 
     public void Launch() 
     {
-        if (!onCoolDown)
+        if (!onCoolDown && !needsReloading)
         {
             m_rb.AddForce(-FindObjectOfType<Camera>().transform.forward * LaunchForce, ForceMode.Impulse);
+            GetComponent<AudioSource>().PlayOneShot(firingNoise, 1.0f);
             onCoolDown = true;
+            needsReloading = true;
+            StartCoroutine(weaponCooldown());
         }
     }
 
+    IEnumerator weaponCooldown() 
+    {
+        yield return new WaitForSeconds(reloadCooldown + firingNoise.length);
+        onCoolDown = false;
+    }
     public void Reload() 
     {
-        onCoolDown = false;
+        if (!onCoolDown && needsReloading && !GetComponent<AudioSource>().isPlaying)
+        {
+            StartCoroutine(weaponReload());
+        }
+    }
+
+    IEnumerator weaponReload() 
+    {
+        GetComponent<AudioSource>().PlayOneShot(reloadNoise, 1.0f);
+        yield return new WaitForSeconds(reloadNoise.length);
+        needsReloading = false;
     }
 }
