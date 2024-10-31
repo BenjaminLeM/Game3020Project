@@ -237,43 +237,42 @@ public class PlayerController : MonoBehaviour
         RaycastHit hit;
 
         //checks for rightside of the player for collisions
-        if (!wallRidingTimerActive) 
+        if (Physics.Linecast(transform.position, transform.position + (transform.right * (0.25f + transform.localScale.x)),
+                                                                out hit, -1,
+                                                                QueryTriggerInteraction.Ignore)
+                && (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0) 
+                && !wallRidingTimerActive)
         {
-            if (Physics.Linecast(transform.position, transform.position + (transform.right * (0.25f + transform.localScale.x)),
-                                                                out hit, -1,
-                                                                QueryTriggerInteraction.Ignore)
-                && (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0))
+            WallJumpForce = (transform.forward * (character.JumpHeight()))
+                - (transform.right * (character.JumpHeight() / 2));
+            if (!isWallRiding && hit.transform != transform)
             {
-                WallJumpForce = (transform.forward * (character.JumpHeight()))
-                    - (transform.right * (character.JumpHeight() / 2));
-                if (!isWallRiding && hit.transform != transform)
-                {
-                    transform.Rotate(Vector3.forward * 15);
-                    LeftRightWall = true;
-                    isWallRiding = true;
-                    //sets gravity to a custom amount, ie low gravity
-                    gravity.EnableCustomGravity();
-                    Debug.Log("right");
-                }
-
+                transform.Rotate(Vector3.forward * 15);
+                LeftRightWall = true;
+                isWallRiding = true;
+                //sets gravity to a custom amount, ie low gravity
+                gravity.EnableCustomGravity();
+                Debug.Log("right");
             }
-            //checks for the leftside of the player for collisions
-            else if (Physics.Linecast(transform.position, transform.position - (transform.right * (0.25f + transform.localScale.x)),
-                                                                out hit, -1,
-                                                                QueryTriggerInteraction.Ignore)
-                && (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0))
+
+        }
+        //checks for the leftside of the player for collisions
+        else if (Physics.Linecast(transform.position, transform.position - (transform.right * (0.25f + transform.localScale.x)),
+                                                            out hit, -1,
+                                                            QueryTriggerInteraction.Ignore)
+            && (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
+            && !wallRidingTimerActive)
+        {
+            WallJumpForce = (transform.forward * (character.JumpHeight()))
+                + (transform.right * (character.JumpHeight() / 2));
+            if (!isWallRiding && hit.transform != transform)
             {
-                WallJumpForce = (transform.forward * (character.JumpHeight()))
-                    + (transform.right * (character.JumpHeight() / 2));
-                if (!isWallRiding && hit.transform != transform)
-                {
-                    transform.Rotate(Vector3.forward * -15);
-                    LeftRightWall = false;
-                    isWallRiding = true;
-                    //sets gravity to a custom amount, ie low gravity
-                    gravity.EnableCustomGravity();
-                    Debug.Log("left");
-                }
+                transform.Rotate(Vector3.forward * -15);
+                LeftRightWall = false;
+                isWallRiding = true;
+                //sets gravity to a custom amount, ie low gravity
+                gravity.EnableCustomGravity();
+                Debug.Log("left");
             }
         }
         else
