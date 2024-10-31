@@ -27,7 +27,7 @@ public class PlayerController : MonoBehaviour
 
     Vector3 WallJumpForce = Vector3.zero;
     bool wallRidingTimerActive = false;
-    float wallRidingCooldown = 0.5f;
+    float wallRidingCooldown = 1.0f;
     float wallRidingTime = 0.0f;
     Vector3 playerMovementVector;
     Vector2 mouseDelta;
@@ -89,7 +89,7 @@ public class PlayerController : MonoBehaviour
         checkGrounded();
 
         //check for if the player can wall ride
-        if (!isGrounded && !wallRidingTimerActive) 
+        if (!isGrounded) 
         {
             checkIsWallRiding();
         }
@@ -192,8 +192,9 @@ public class PlayerController : MonoBehaviour
         //checks for wallriding
         else if (isWallRiding && Input.GetAxisRaw("Jump") > 0 && !wallRidingTimerActive) 
         {
-            m_rb.AddForce(calculatedJumpForce * transform.up/2, ForceMode.Impulse);
+            m_rb.AddForce(calculatedJumpForce * transform.up * 3, ForceMode.Impulse);
             m_rb.AddForce(WallJumpForce, ForceMode.Impulse);
+            Debug.Log(wallRidingTime);
             wallRidingTimerActive = true;
         }
 
@@ -234,53 +235,56 @@ public class PlayerController : MonoBehaviour
     void checkIsWallRiding() 
     {
         RaycastHit hit;
-        
+
         //checks for rightside of the player for collisions
-        if (Physics.Linecast(transform.position, transform.position + (transform.right * (0.25f + transform.localScale.x) ),
-                                                            out hit, -1,
-                                                            QueryTriggerInteraction.Ignore)
-            && (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0))
+        if (!wallRidingTimerActive) 
         {
-            WallJumpForce = (transform.forward * (character.JumpHeight())) 
-                - (transform.right * (character.JumpHeight()/2));
-            if (!isWallRiding && hit.transform != transform) 
+            if (Physics.Linecast(transform.position, transform.position + (transform.right * (0.25f + transform.localScale.x)),
+                                                                out hit, -1,
+                                                                QueryTriggerInteraction.Ignore)
+                && (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0))
             {
-                transform.Rotate(Vector3.forward * 15);
-                LeftRightWall = true;
-                isWallRiding = true;
-                //sets gravity to a custom amount, ie low gravity
-                gravity.EnableCustomGravity();
-                Debug.Log("right");
+                WallJumpForce = (transform.forward * (character.JumpHeight()))
+                    - (transform.right * (character.JumpHeight() / 2));
+                if (!isWallRiding && hit.transform != transform)
+                {
+                    transform.Rotate(Vector3.forward * 15);
+                    LeftRightWall = true;
+                    isWallRiding = true;
+                    //sets gravity to a custom amount, ie low gravity
+                    gravity.EnableCustomGravity();
+                    Debug.Log("right");
+                }
+
             }
-            
-        }
-        //checks for the leftside of the player for collisions
-        else if (Physics.Linecast(transform.position, transform.position - (transform.right * (0.25f + transform.localScale.x)),
-                                                            out hit, -1,
-                                                            QueryTriggerInteraction.Ignore)
-            && (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0))
-        {
-            WallJumpForce = (transform.forward * (character.JumpHeight()))
-                + (transform.right * (character.JumpHeight() / 2));
-            if (!isWallRiding && hit.transform!=transform)
+            //checks for the leftside of the player for collisions
+            else if (Physics.Linecast(transform.position, transform.position - (transform.right * (0.25f + transform.localScale.x)),
+                                                                out hit, -1,
+                                                                QueryTriggerInteraction.Ignore)
+                && (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0))
             {
-                transform.Rotate(Vector3.forward * -15);
-                LeftRightWall = false;
-                isWallRiding = true;
-                //sets gravity to a custom amount, ie low gravity
-                gravity.EnableCustomGravity();
-                Debug.Log("left");
+                WallJumpForce = (transform.forward * (character.JumpHeight()))
+                    + (transform.right * (character.JumpHeight() / 2));
+                if (!isWallRiding && hit.transform != transform)
+                {
+                    transform.Rotate(Vector3.forward * -15);
+                    LeftRightWall = false;
+                    isWallRiding = true;
+                    //sets gravity to a custom amount, ie low gravity
+                    gravity.EnableCustomGravity();
+                    Debug.Log("left");
+                }
             }
         }
-        else 
+        else
         {
-            if (isWallRiding) 
+            if (isWallRiding)
             {
                 if (LeftRightWall)
                 {
                     transform.Rotate(Vector3.forward * -15);
                 }
-                else 
+                else
                 {
                     transform.Rotate(Vector3.forward * 15);
                 }
@@ -297,7 +301,7 @@ public class PlayerController : MonoBehaviour
         if (wallRidingTime >= wallRidingCooldown)
         {
             wallRidingTimerActive = false;
-            groundedTime = 0;
+            wallRidingTime = 0;
         }
     }
     void checkGrounded() 
