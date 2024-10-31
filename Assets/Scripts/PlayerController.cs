@@ -44,12 +44,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     Camera ThirdPersonCamera;
 
+    GameManager m_gameManager;
+
     float cameraIncresedFOVAmount = 0;
 
     ShotgunJump gunJump;
-
-    [SerializeField]
-    Canvas PauseMenu;
 
     AudioClip slidingSound;
     void Start()
@@ -57,6 +56,8 @@ public class PlayerController : MonoBehaviour
         m_rb = GetComponent<Rigidbody>();
 
         character = GetComponent<PlayerCharacter>();
+
+        m_gameManager = FindAnyObjectByType<GameManager>();
 
         gravity = GetComponent<CustomPlayerGravity>();
 
@@ -221,9 +222,7 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetAxisRaw("Pause") > 0) 
         {
-            PauseMenu.gameObject.SetActive(true);
-            Time.timeScale = 0;
-            Cursor.lockState = CursorLockMode.None;
+            m_gameManager.pauseGame();
         }
 
         if (Input.GetAxisRaw("CameraSwitch") > 0)

@@ -37,6 +37,7 @@ public class MainMenu : MonoBehaviour
     void StartGame() 
     {
         Cursor.lockState = CursorLockMode.Locked;
+        Time.timeScale = 1;
         SceneManager.LoadScene("SampleScene");
     }
 

@@ -4,10 +4,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class PauseMenu : MonoBehaviour
+public class WinScreen : MonoBehaviour
 {
-    [SerializeField]
-    Canvas PlayerUI;
     [SerializeField]
     Button Button1;
     [SerializeField]
@@ -16,24 +14,21 @@ public class PauseMenu : MonoBehaviour
     Button Button3;
     private void Awake()
     {
-        Button1.onClick.AddListener(delegate { Resume(); });
+        Button1.onClick.AddListener(delegate { Retry(); });
         Button2.onClick.AddListener(delegate { MainMenu(); });
         Button3.onClick.AddListener(delegate { Quit(); });
     }
 
-    void Resume()
+    void Retry()
     {
-        PlayerUI.gameObject.SetActive(true);
-        Cursor.lockState = CursorLockMode.Locked;
-        Time.timeScale = 1.0f;
-        gameObject.SetActive(false);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
-    void MainMenu() 
+    void MainMenu()
     {
         Cursor.lockState = CursorLockMode.None;
         SceneManager.LoadScene("MainMenu");
     }
-    void Quit() 
+    void Quit()
     {
         Application.Quit();
     }
