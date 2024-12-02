@@ -42,8 +42,6 @@ public class PlayerController : MonoBehaviour
     float currentAnglePos = 0;
     [SerializeField]
     Camera fpsCamera;
-    [SerializeField]
-    Camera ThirdPersonCamera;
 
     GameManager m_gameManager;
 
@@ -61,7 +59,7 @@ public class PlayerController : MonoBehaviour
         Debug.Log(m_rb.name);
         oth_rb = transform.GetChild(0).GetComponent<Rigidbody>();
         Debug.Log(oth_rb.name);
-
+        
         character = GetComponent<PlayerCharacter>();
 
         m_gameManager = FindAnyObjectByType<GameManager>();
@@ -138,13 +136,11 @@ public class PlayerController : MonoBehaviour
     void cameraIncreaseFOV(float amount) 
     {
         fpsCamera.fieldOfView += amount;
-        ThirdPersonCamera.fieldOfView += amount;
         cameraIncresedFOVAmount += amount;
     }
     void resetCameraFOV() 
     {
         fpsCamera.fieldOfView -= cameraIncresedFOVAmount;
-        ThirdPersonCamera.fieldOfView -= cameraIncresedFOVAmount;
         cameraIncresedFOVAmount = 0;
     }
     void checkPlayerCameraJoint() 
@@ -170,11 +166,9 @@ public class PlayerController : MonoBehaviour
             if (isCrouching && sprintTimer >= character.SlideCooldown())
             {
                 sprintTimer = 0;
-                Debug.Log(isGrounded);
                 //player can only slide if the player is considered grounded
                 if (isGrounded)
                 {
-                    Debug.Log(transform.forward * character.SlideSpeed());
                     m_rb.AddForce(transform.forward * character.SlideSpeed(), ForceMode.Impulse);
                     
                     GetComponent<AudioSource>().PlayOneShot(slidingSound, 0.5f);
@@ -207,39 +201,6 @@ public class PlayerController : MonoBehaviour
             character.setPlayerMoveSpeed(character.WalkSpeed());
             character.setCurrentHeight(1);
             resetCameraFOV();
-        }
-        
-        
-
-        if (Input.GetAxisRaw("Pause") > 0) 
-        {
-            m_gameManager.pauseGame();
-        }
-
-        if (Input.GetAxisRaw("CameraSwitch") > 0)
-        {
-            
-                fpsCamera.enabled = false;
-                ThirdPersonCamera.enabled = true;
-            
-        }
-        else if (Input.GetAxisRaw("CameraSwitch") < 0) 
-        {
-            fpsCamera.enabled = true;
-            ThirdPersonCamera.enabled = false;
-        }
-
-        if (gunJump != null)
-        {
-            if (Input.GetAxisRaw("Fire1") > 0)
-            {
-                gunJump.Launch();
-            }
-
-            if (Input.GetAxisRaw("Fire2") > 0)
-            {
-                gunJump.Reload();
-            }
         }
     }
     public void WASDMovement(InputAction.CallbackContext callback) 
@@ -295,6 +256,24 @@ public class PlayerController : MonoBehaviour
             isCrouching = false;
         }
     }
+
+    public void Shoot(InputAction.CallbackContext callback) 
+    {
+        if(gunJump != null && callback.performed)
+            gunJump.Launch();
+    }
+    public void Reload(InputAction.CallbackContext callback)
+    {
+        if (gunJump != null && callback.performed)
+            gunJump.Reload();
+    }
+
+    public void Pause(InputAction.CallbackContext callback) 
+    {
+        if(callback.performed)
+            m_gameManager.pauseGame();
+    }
+
     void checkIsWallRiding() 
     {
         RaycastHit hit;
@@ -315,7 +294,6 @@ public class PlayerController : MonoBehaviour
                 isWallRiding = true;
                 //sets gravity to a custom amount, ie low gravity
                 gravity.EnableCustomGravity();
-                Debug.Log("right");
             }
 
         }
@@ -335,7 +313,6 @@ public class PlayerController : MonoBehaviour
                 isWallRiding = true;
                 //sets gravity to a custom amount, ie low gravity
                 gravity.EnableCustomGravity();
-                Debug.Log("left");
             }
         }
         else

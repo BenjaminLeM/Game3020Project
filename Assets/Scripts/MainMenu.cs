@@ -45,33 +45,33 @@ public class MainMenu : MonoBehaviour
 
     void SwitchActiveButtons() 
     {
-        Button1.gameObject.SetActive(!Button1.gameObject.active);
-        Button2.gameObject.SetActive(!Button2.gameObject.active);
-        Button3.gameObject.SetActive(!Button3.gameObject.active);
-        Button4.gameObject.SetActive(!Button4.gameObject.active);
-        Button5.gameObject.SetActive(!Button5.gameObject.active);
-        Button6.gameObject.SetActive(!Button6.gameObject.active);
+        Button1.gameObject.SetActive(!Button1.gameObject.activeSelf);
+        Button2.gameObject.SetActive(!Button2.gameObject.activeSelf);
+        Button3.gameObject.SetActive(!Button3.gameObject.activeSelf);
+        Button4.gameObject.SetActive(!Button4.gameObject.activeSelf);
+        Button5.gameObject.SetActive(!Button5.gameObject.activeSelf);
+        Button6.gameObject.SetActive(!Button6.gameObject.activeSelf);
     }
     void SwitchMenuToInstruction() 
     {
         SwitchActiveButtons();
-        TitleText.gameObject.SetActive(!TitleText.gameObject.active);
+        TitleText.gameObject.SetActive(!TitleText.gameObject.activeSelf);
     }
 
     void SwitchMenuToMainMenu() 
     {
         SwitchActiveButtons();
-        TitleText.gameObject.SetActive(!TitleText.gameObject.active);
-        if(InstructionText.gameObject.active)
+        TitleText.gameObject.SetActive(!TitleText.gameObject.activeSelf);
+        if(InstructionText.gameObject.activeSelf)
             InstructionText.gameObject.SetActive(false);
-        else if(ControlsText.gameObject.active)
+        else if(ControlsText.gameObject.activeSelf)
             ControlsText.gameObject.SetActive(false);
     }
 
     void OpenInstructions() 
     {
         InstructionText.gameObject.SetActive(true);
-        if (ControlsText.gameObject.active) 
+        if (ControlsText.gameObject.activeSelf) 
         {
             ControlsText.gameObject.SetActive(false);
         }
@@ -80,7 +80,7 @@ public class MainMenu : MonoBehaviour
     void OpenControls() 
     {
         ControlsText.gameObject.SetActive(true);
-        if (InstructionText.gameObject.active)
+        if (InstructionText.gameObject.activeSelf)
         {
             InstructionText.gameObject.SetActive(false);
         }
