@@ -10,7 +10,7 @@ public class CustomPlayerGravity : MonoBehaviour
     bool m_enabled = false;
     private void Awake()
     {
-        m_rb = GetComponent<Rigidbody>();
+        m_rb = GetComponentInChildren<Rigidbody>();
     }
 
     public void EnableCustomGravity() 
