@@ -9,7 +9,6 @@ public class PlayerCharacter : MonoBehaviour
     float walkSpeed;
     [SerializeField]
     float jumpHeight;
-    bool isSprinting = false;
     [SerializeField]
     float sprintSpeed;
     [SerializeField]

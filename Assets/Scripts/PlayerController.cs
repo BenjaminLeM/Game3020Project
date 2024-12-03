@@ -16,15 +16,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     float groundedCooldown = 0.1f;
     float groundedTime = 0.0f;
-    bool groundedTimerActive = false;
     bool isGrounded = false;
     float timeSinceLastGrounded = 0.0f;
     float coyoteJump = 0.5f;
 
     //if player is wallRiding used to detect if they can wall jump
     bool isWallRiding = false;
-    //used to detect the last side of the character touched a wall
-    bool LeftRightWall = false;
 
     Vector3 WallJumpForce = Vector3.zero;
     bool wallRidingTimerActive = false;
@@ -42,8 +39,6 @@ public class PlayerController : MonoBehaviour
     float currentAnglePos = 0;
 
     GameManager m_gameManager;
-
-    float cameraIncresedFOVAmount = 0;
 
     ShotgunJump gunJump;
 
@@ -282,7 +277,6 @@ public class PlayerController : MonoBehaviour
             if (!isWallRiding && hit.transform != transform)
             {
                 oth_rb.transform.Rotate(Vector3.forward * 15);
-                LeftRightWall = true;
                 isWallRiding = true;
                 //sets gravity to a custom amount, ie low gravity
                 gravity.EnableCustomGravity();
@@ -301,7 +295,6 @@ public class PlayerController : MonoBehaviour
             if (!isWallRiding && hit.transform != transform)
             {
                 oth_rb.transform.Rotate(Vector3.forward * -15);
-                LeftRightWall = false;
                 isWallRiding = true;
                 //sets gravity to a custom amount, ie low gravity
                 gravity.EnableCustomGravity();
