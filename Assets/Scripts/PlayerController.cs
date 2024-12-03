@@ -40,8 +40,6 @@ public class PlayerController : MonoBehaviour
     float CameraSpring = 2000.0f;
     float CameraSpringDampen = 10.0f;
     float currentAnglePos = 0;
-    [SerializeField]
-    Camera fpsCamera;
 
     GameManager m_gameManager;
 
@@ -53,6 +51,8 @@ public class PlayerController : MonoBehaviour
 
     bool isSprinting = false;
     bool isCrouching = false;
+
+    CameraFOVController cameraFOVController;
     void Start()
     {
         m_rb = GetComponent<Rigidbody>();
@@ -73,6 +73,8 @@ public class PlayerController : MonoBehaviour
         setCameraJoints();
 
         Cursor.lockState = CursorLockMode.Locked;
+
+        cameraFOVController = GetComponent<CameraFOVController>();
     }
 
     // Update is called once per frame
@@ -132,17 +134,6 @@ public class PlayerController : MonoBehaviour
         m_cameraJoint.spring = m_springJoint;
         cameraRotation = Vector2.zero;
     }
-
-    void cameraIncreaseFOV(float amount) 
-    {
-        fpsCamera.fieldOfView += amount;
-        cameraIncresedFOVAmount += amount;
-    }
-    void resetCameraFOV() 
-    {
-        fpsCamera.fieldOfView -= cameraIncresedFOVAmount;
-        cameraIncresedFOVAmount = 0;
-    }
     void checkPlayerCameraJoint() 
     {
         if (currentAnglePos > m_cameraJoint.limits.max)
@@ -159,14 +150,13 @@ public class PlayerController : MonoBehaviour
     {
         if (isSprinting)
         {
-            if (sprintTimer == 0 && Input.GetAxisRaw("Crouch") == 0)
+            if (sprintTimer == 0)
             {
-                cameraIncreaseFOV(10.0f);
+                //cameraIncreaseFOV(10.0f);
             }
             if (isCrouching && sprintTimer >= character.SlideCooldown())
             {
                 sprintTimer = 0;
-                //player can only slide if the player is considered grounded
                 if (isGrounded)
                 {
                     m_rb.AddForce(transform.forward * character.SlideSpeed(), ForceMode.Impulse);
@@ -193,14 +183,14 @@ public class PlayerController : MonoBehaviour
             sprintTimer = 0;
             character.setPlayerMoveSpeed(character.CrouchSpeed());
             character.setCurrentHeight(character.getCrouchHeight());
-            resetCameraFOV();
+            //resetCameraFOV();
         }
         else
         {
             sprintTimer = 0;
             character.setPlayerMoveSpeed(character.WalkSpeed());
             character.setCurrentHeight(1);
-            resetCameraFOV();
+            //resetCameraFOV();
         }
     }
     public void WASDMovement(InputAction.CallbackContext callback) 
@@ -238,10 +228,12 @@ public class PlayerController : MonoBehaviour
         if (callback.performed)
         {
             isSprinting = true;
+            cameraFOVController.startSprintFOV(5 * Time.deltaTime);
         }
         else 
         {
             isSprinting = false;
+            cameraFOVController.stopSprintFOV(5 * Time.deltaTime);
         }
     }
 

@@ -53,7 +53,7 @@
                 {
                     "name": "Fire",
                     "type": "Button",
-                    "id": "692d49d6-dcc2-4126-8e13-ed1736e933ce",
+                    "id": "0e2e7851-b3cd-47ec-8ce0-73d7e9623f27",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -62,7 +62,7 @@
                 {
                     "name": "Reload",
                     "type": "Button",
-                    "id": "3bb6f0d7-441c-4f12-8f20-4ba76b777295",
+                    "id": "b250625c-5bb8-4850-8304-4c87806d1fb9",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -180,9 +180,20 @@
                 },
                 {
                     "name": "",
-                    "id": "0d3ec810-e56c-42db-bc40-84774d37befa",
+                    "id": "6c47e4e1-4312-4a8d-844b-38f5b799fddf",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b65b416e-efb2-4260-9432-765ead8bedda",
                     "path": "<Keyboard>/r",
-                    "interactions": "",
+                    "interactions": "Press(pressPoint=0.05)",
                     "processors": "",
                     "groups": "",
                     "action": "Reload",
@@ -191,23 +202,12 @@
                 },
                 {
                     "name": "",
-                    "id": "40281b26-07d1-407b-8b2a-560701a8c823",
+                    "id": "e630b06d-676b-48b4-a4c9-c09900406d36",
                     "path": "<Mouse>/leftButton",
-                    "interactions": "Press",
+                    "interactions": "Press(pressPoint=0.05)",
                     "processors": "",
                     "groups": "",
                     "action": "Fire",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "6c47e4e1-4312-4a8d-844b-38f5b799fddf",
-                    "path": "<Keyboard>/tab",
-                    "interactions": "Press",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Pause",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -6,6 +6,8 @@ using UnityEngine;
 public class ShotGunPickUpBehaviour : BasePickUpBehaviour
 {
     PickUp m_pickup;
+    [SerializeField]
+    GameObject gun;
     private void Awake()
     {
         if (transform.childCount > 0)
@@ -21,21 +23,13 @@ public class ShotGunPickUpBehaviour : BasePickUpBehaviour
     }
     public override void PickUpAction() 
     {
-        FindAnyObjectByType<PlayerCharacter>().gameObject.AddComponent<ShotgunJump>();
-        FindAnyObjectByType<PlayerController>().setGunComp(FindAnyObjectByType<PlayerCharacter>().GetComponent<ShotgunJump>());
-        GameObject gun = Instantiate(Resources.Load<GameObject>("Models/ShortDoubleBarrel"));
-        gun.transform.parent = FindAnyObjectByType<PlayerCharacter>().transform.GetChild(0).GetChild(0);
+        GameObject player = FindAnyObjectByType<PlayerCharacter>().gameObject;
+        player.GetComponent<PlayerController>().setGunComp(gun.GetComponent<ShotgunJump>());
+        gun.GetComponent<ShotgunJump>().attached_rb = player.GetComponent<Rigidbody>();
+        gun.transform.parent = FindAnyObjectByType<PlayerCharacter>().transform.GetChild(0).GetChild(0).GetChild(0);
         gun.transform.position = gun.transform.parent.position + gun.transform.parent.forward - (gun.transform.parent.up * 0.25f);
         gun.transform.forward = -gun.transform.parent.forward;
 
-        StartCoroutine(despawnObject(0));
-    }
-
-    IEnumerator despawnObject(float delay)
-    {
-        GetComponent<Collider>().enabled = false;
-        transform.GetChild(0).gameObject.SetActive(false);
-        yield return new WaitForSeconds(delay);
         Destroy(gameObject);
     }
 }

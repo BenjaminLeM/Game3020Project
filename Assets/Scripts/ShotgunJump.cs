@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,14 +9,14 @@ public class ShotgunJump : MonoBehaviour
     bool onCoolDown = false;
     bool needsReloading = false;
     float reloadCooldown = 1.0f;
-    Rigidbody m_rb;
+    [NonSerialized]
+    public Rigidbody attached_rb;
 
     AudioClip firingNoise;
 
     AudioClip reloadNoise;
     private void Awake()
     {
-        m_rb = GetComponent<Rigidbody>();
         firingNoise = Resources.Load<AudioClip>("SFX/ShotGunFiring");
         reloadNoise = Resources.Load<AudioClip>("SFX/ShotGunReload");
     }
@@ -24,7 +25,7 @@ public class ShotgunJump : MonoBehaviour
     {
         if (!onCoolDown && !needsReloading)
         {
-            m_rb.AddForce(-FindObjectOfType<Camera>().transform.forward * LaunchForce, ForceMode.Impulse);
+            attached_rb.AddForce(-FindObjectOfType<Camera>().transform.forward * LaunchForce, ForceMode.Impulse);
             GetComponent<AudioSource>().PlayOneShot(firingNoise, 1.0f);
             onCoolDown = true;
             needsReloading = true;

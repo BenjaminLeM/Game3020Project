@@ -167,6 +167,7 @@ GameObject:
   - component: {fileID: 5476381297994564727}
   - component: {fileID: 8529164463928291128}
   - component: {fileID: 4253258590528445324}
+  - component: {fileID: 5293869555722117156}
   - component: {fileID: 6447488425427033576}
   - component: {fileID: 2709987756246586200}
   m_Layer: 3
@@ -260,7 +261,6 @@ MonoBehaviour:
     m_Bits: 1
   groundedCooldown: 0.1
   cameraSpeed: 150
-  fpsCamera: {fileID: 5357974168823377419}
 --- !u!114 &5476381297994564727
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -307,6 +307,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ResetPosition: {fileID: 0}
   VerticalBound: -2
+--- !u!114 &5293869555722117156
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3286441707196058560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1fd39b475456d8e49afe4d588072d251, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fpsCamera: {fileID: 5357974168823377419}
+  defaultFOV: 60
+  SprintFOV: 80
 --- !u!82 &6447488425427033576
 AudioSource:
   m_ObjectHideFlags: 0
@@ -512,6 +527,22 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 8142742018404660228}
         m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: Pause
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 10129fa1-445e-4afb-b192-2082d1969c43
+    m_ActionName: Default/Pause[/Keyboard/tab]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8142742018404660228}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
         m_MethodName: Shoot
         m_Mode: 0
         m_Arguments:
@@ -522,7 +553,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-    m_ActionId: 692d49d6-dcc2-4126-8e13-ed1736e933ce
+    m_ActionId: 0e2e7851-b3cd-47ec-8ce0-73d7e9623f27
     m_ActionName: Default/Fire[/Mouse/leftButton]
   - m_PersistentCalls:
       m_Calls:
@@ -538,24 +569,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-    m_ActionId: 3bb6f0d7-441c-4f12-8f20-4ba76b777295
+    m_ActionId: b250625c-5bb8-4850-8304-4c87806d1fb9
     m_ActionName: Default/Reload[/Keyboard/r]
-  - m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8142742018404660228}
-        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
-        m_MethodName: Pause
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-    m_ActionId: 10129fa1-445e-4afb-b192-2082d1969c43
-    m_ActionName: Default/Pause[/Keyboard/tab]
   m_NeverAutoSwitchControlSchemes: 1
   m_DefaultControlScheme: default control scheme
   m_DefaultActionMap: Default
