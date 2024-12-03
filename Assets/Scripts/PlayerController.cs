@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -54,7 +55,7 @@ public class PlayerController : MonoBehaviour
         Debug.Log(m_rb.name);
         oth_rb = transform.GetChild(0).GetComponent<Rigidbody>();
         Debug.Log(oth_rb.name);
-        
+
         character = GetComponent<PlayerCharacter>();
 
         m_gameManager = FindAnyObjectByType<GameManager>();
@@ -223,12 +224,12 @@ public class PlayerController : MonoBehaviour
         if (callback.performed)
         {
             isSprinting = true;
-            cameraFOVController.startSprintFOV(5 * Time.deltaTime);
+            cameraFOVController.startSprintFOV(Time.deltaTime / character.SlideCooldown());
         }
         else 
         {
             isSprinting = false;
-            cameraFOVController.stopSprintFOV(5 * Time.deltaTime);
+            cameraFOVController.stopSprintFOV(Time.deltaTime / character.SlideCooldown());
         }
     }
 
