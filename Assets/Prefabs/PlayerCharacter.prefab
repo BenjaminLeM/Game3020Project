@@ -322,7 +322,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fpsCamera: {fileID: 5357974168823377419}
   defaultFOV: 60
-  SprintFOV: 80
+  SprintFOV: 100
 --- !u!82 &6447488425427033576
 AudioSource:
   m_ObjectHideFlags: 0
