@@ -20,7 +20,11 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     Canvas WinMenu;
     [SerializeField]
-    TextMeshProUGUI WinScoreText;
+    float ScoreObj = 2000; // score required for highest grade
+    [SerializeField]
+    float TimerObj = 120; // time required for the highest grade
+
+    bool gameComplete = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -30,8 +34,10 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        UpdateGameTimer();
-
+        if (!gameComplete)
+        {
+            UpdateGameTimer();
+        }
     }
 
     private void FixedUpdate()
@@ -84,7 +90,38 @@ public class GameManager : MonoBehaviour
         WinMenu.gameObject.SetActive(true);
         Time.timeScale = 0;
         Cursor.lockState = CursorLockMode.None;
-        WinScoreText.text = "Score: " + getScore();
-        SaveLevelScore.SaveLevelHighScore(getScore(), "a");
+        string grade = calculateGrade();
+        WinMenu.GetComponent<WinScreen>().SetWinScreenScores(getScore(), grade);
+        SaveLevelScore.SaveLevelHighScore(getScore(), grade);
+    }
+
+    string calculateGrade() 
+    {
+        string grade = "D";
+        if (getScore() >= ScoreObj * 0.4f && GameTime <= TimerObj * 1.6f)
+        {
+            grade = "C";
+            if (getScore() >= ScoreObj * 0.6f && GameTime <= TimerObj * 1.4f)
+            {
+                grade = "B";
+                if (getScore() >= ScoreObj * 0.8f && GameTime <= TimerObj * 1.2f)
+                {
+                    grade = "A";
+                    if (getScore() >= ScoreObj * 0.9f && GameTime <= TimerObj * 1.1f)
+                    {
+                        grade = "S";
+                        if (getScore() >= ScoreObj * 0.95f && GameTime <= TimerObj * 1.05f)
+                        {
+                            grade = "S+";
+                            if (getScore() >= ScoreObj  && GameTime <= TimerObj)
+                            {
+                                grade = "P";
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return grade;
     }
 }

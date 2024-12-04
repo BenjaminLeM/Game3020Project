@@ -260,7 +260,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   groundedCooldown: 0.1
-  cameraSpeed: 150
+  wallRidingCooldown: 0.75
+  cameraSpeed: 50
 --- !u!114 &5476381297994564727
 MonoBehaviour:
   m_ObjectHideFlags: 0

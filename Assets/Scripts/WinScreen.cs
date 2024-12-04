@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -12,6 +13,10 @@ public class WinScreen : MonoBehaviour
     Button Button2;
     [SerializeField]
     Button Button3;
+    [SerializeField]
+    TextMeshProUGUI FinalScore;
+    [SerializeField]
+    TextMeshProUGUI FinalGrade;
     private void Awake()
     {
         Button1.onClick.AddListener(delegate { Retry(); });
@@ -33,5 +38,11 @@ public class WinScreen : MonoBehaviour
     void Quit()
     {
         Application.Quit();
+    }
+
+    public void SetWinScreenScores(float score, string grade) 
+    {
+        FinalGrade.text = grade;
+        FinalScore.text = "Score: " + score;
     }
 }

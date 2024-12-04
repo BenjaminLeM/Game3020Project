@@ -26,6 +26,7 @@ public class PlayerController : MonoBehaviour
 
     Vector3 WallJumpForce = Vector3.zero;
     bool wallRidingTimerActive = false;
+    [SerializeField]
     float wallRidingCooldown = 1.0f;
     float wallRidingTime = 0.0f;
     Vector3 playerMovementVector;
@@ -207,8 +208,9 @@ public class PlayerController : MonoBehaviour
             }
             else if (isWallRiding)
             {
-                m_rb.AddForce(calculatedJumpForce * transform.up * 3, ForceMode.Impulse);
+                m_rb.AddForce(calculatedJumpForce * transform.up * 2f, ForceMode.Impulse);
                 m_rb.AddForce(WallJumpForce, ForceMode.Impulse);
+                Debug.Log(WallJumpForce);
                 wallRidingTimerActive = true;
             }
         }
@@ -273,8 +275,8 @@ public class PlayerController : MonoBehaviour
                 && (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0) 
                 && !wallRidingTimerActive)
         {
-            WallJumpForce = (transform.forward * (character.JumpHeight()))
-                - (transform.right * (character.JumpHeight() / 2));
+            WallJumpForce = (transform.forward * (character.JumpHeight() * 5))
+                - (transform.right * (character.JumpHeight() * 5));
             if (!isWallRiding && hit.transform != transform)
             {
                 oth_rb.transform.Rotate(Vector3.forward * 15);
@@ -291,8 +293,8 @@ public class PlayerController : MonoBehaviour
             && (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
             && !wallRidingTimerActive)
         {
-            WallJumpForce = (transform.forward * (character.JumpHeight()))
-                + (transform.right * (character.JumpHeight() / 2));
+            WallJumpForce = (transform.forward * (character.JumpHeight() * 5))
+                + (transform.right * (character.JumpHeight() * 5));
             if (!isWallRiding && hit.transform != transform)
             {
                 oth_rb.transform.Rotate(Vector3.forward * -15);
