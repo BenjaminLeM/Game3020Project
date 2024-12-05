@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -16,9 +17,19 @@ public class LevelHighScore
 }
 public class SaveLevelScore : MonoBehaviour
 {
+    static void CreateSaveFolder(string fileDest) 
+    {
+        DirectoryInfo fileloc = new DirectoryInfo(fileDest);
+        if (!fileloc.Exists)
+        {
+            Directory.CreateDirectory(fileDest);
+        }
+    }
     public static void SaveLevelHighScore(float score, string grade) 
     {
-        string destination = "SaveData/" + SceneManager.GetActiveScene().name + ".json";
+        string destination = "SaveData/";
+        CreateSaveFolder(destination);
+        destination = destination + SceneManager.GetActiveScene().name + ".json";
         LevelHighScore previousHighScore = null;
         if (tryLoadData(out previousHighScore, SceneManager.GetActiveScene().name))
         {
@@ -40,6 +51,7 @@ public class SaveLevelScore : MonoBehaviour
     public static bool tryLoadData(out LevelHighScore data, string LevelName)
     {
         string destination = "SaveData/";
+        CreateSaveFolder(destination);
         LevelHighScore loadedData = null;
         DirectoryInfo path = new DirectoryInfo(destination);
         FileInfo[] files = path.GetFiles("*.json");

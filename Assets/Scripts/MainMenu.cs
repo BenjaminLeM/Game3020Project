@@ -26,7 +26,7 @@ public class MainMenu : MonoBehaviour
     [SerializeField]
     Text ControlsText;
     [SerializeField]
-    RectTransform Levels;
+    GameObject Levels;
     [SerializeField]
     List<Button> LevelButtons = new List<Button>();
     private void Awake()
@@ -69,7 +69,8 @@ public class MainMenu : MonoBehaviour
                 LevelButtons[1].GetComponent<Button>().enabled = false;
             }
         }
-        Levels.gameObject.SetActive(true);
+        Levels.SetActive(true);
+        
     }
     void StartGame(string SceneName) 
     {
